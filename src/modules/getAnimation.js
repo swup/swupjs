@@ -18,7 +18,7 @@ module.exports = function (transition, animations, type) {
 
             // equals to CUSTOM animation
             if (to == transition.custom) {
-                rating=rating++
+                rating=rating+2
             }
 
             // FROM equals or is ANY

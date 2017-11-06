@@ -1,0 +1,31 @@
+{
+  "name": "swupjs",
+  "version": "0.1.0",
+  "description": "Animated page transitions with JS - swup extension.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "babel --presets es2015,stage-0 -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "author": "Georgy Marchuk",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gmrchk/swupjs.git"
+  },
+  "keywords": [
+    "js",
+    "animation",
+    "page",
+    "transition"
+  ],
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1"
+  },
+  "dependencies": {
+    "swup": "^0.1.3"
+  }
+}
