@@ -41,8 +41,10 @@ module.exports = function (page, popstate) {
 
     // detect animation end
     let animationPromises = []
-    let animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'in'))
-    animationPromises.push(animationPromise)
+    if (!popstate) {
+        let animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'in'))
+        animationPromises.push(animationPromise)
+    }
 
     Promise
         .all(animationPromises)
