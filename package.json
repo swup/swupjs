@@ -26,6 +26,6 @@
     "babel-preset-stage-0": "^6.24.1"
   },
   "dependencies": {
-    "swup": "^0.2.3"
+    "swup": "^0.2.4"
   }
 }
