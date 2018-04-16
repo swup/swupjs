@@ -1,6 +1,6 @@
 {
   "name": "swupjs",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Animated page transitions with JS - swup extension.",
   "main": "lib/index.js",
   "scripts": {
@@ -26,6 +26,6 @@
     "babel-preset-stage-0": "^6.24.1"
   },
   "dependencies": {
-    "swup": "^0.2.4"
+    "swup": "^0.2.5"
   }
 }
