@@ -1,9 +1,11 @@
-# swup
-Swupjs is an extension of [swup](https://www.npmjs.com/package/swup) npm module, which modifies the module for use with JS animations.
+# swupjs
+Swupjs is an extension of [swup](https://github.com/gmrchk/swup), which modifies the module for use with JavaScript animations.
 
-Swupjs only slightly modifies swup, where all the capabilities of swup remain the same, with only one exception - timing and animations are based on JS, not css transitions. 
-**is-animating** class on html tag is no longer present in the lifecycle of page transition. 
-This is not necessary, but if you want to take advantage of high performance brought by JS animations, you should not degrade it by combining it with css animation.
+Swupjs only slightly modifies swup, where all the capabilities of swup remain the same, with only one exception - timing and animations are based on JavaScript, not CSS transitions. 
+For more information about functionality and idea of swupjs, refer to [swup](https://github.com/gmrchk/swup) documentation.
+
+`is-animating` class on html tag is no longer present in the lifecycle of page transition. 
+This is not necessary. However, if we want to take advantage of high performance brought by JavaScript animations, we should not degrade it by combining it with CSS animation.
 
 ## Installation
 ```shell
@@ -33,15 +35,19 @@ animations: {
 }
 ```
 
-Example above is the default option in swupjs and defines two animations, where **out** is the animation (function) being executed before content replace, and **in** is animation being executed after content is replaced.
-As you may noticed, one parameter is passed into both functions. Call of `next` function serves as an indicator, that animation is done - so in a real world `next()` would be called as a callback of the animation.
+The example above is the default setup in swupjs and defines two animations, where **out** is the animation (function) being executed before content replace, and **in** is animation being executed after the content is replaced.
+As one may have noticed, one parameter is passed into both functions. Call of `next` function serves as an indicator, that animation is done - so in a real world `next()` would be called as a callback of the animation. 
+
+As you can see, by default no animation is being executed and `next()` is called right away. 
+
+**Note:** Although the whole purpose of swup is to enable page transitions, this can still enhance your user experience even without the animation as it can shorten your load time drastically when preload and/or cache options are set to `true`. In most cases, your page change should be immediate without any wait time.
 
 ```javascript
 out: function (next) {
     setTimeout(next, 2000)
 }
 ```
-In the example above, next function is called after two seconds, which means that swupjs would wait two seconds (or any time necessary for load of the new page content), before continuing to the content replace.
+In the example above, next function is called after two seconds, which means that swupjs would wait two seconds (or any time necessary for the load of the new page content), before continuing to the content replace.
 
 Animation object needs to be passed as a part of your options.
 
@@ -62,8 +68,8 @@ const swupjs = new Swupjs(options)
 ```
 
 ## Choosing the animation 
-As one may have noticed, the name of animation object in options is defined as `'*'`, which serves as a fallback or base animation done through out the website. 
-Custom animations can be defined for transition between any pages, where the name is defined by `[starting route]>[final route]`. 
+As one may have noticed, the name of animation object in options is defined as `'*'`, which serves as a fallback or base set of animations used throughout the website. 
+Custom animations can be defined for a transition between any pages, where the name is defined by `[starting route]>[final route]`. 
 
 ```javascript
 ...
@@ -78,12 +84,12 @@ Custom animations can be defined for transition between any pages, where the nam
 ...
 ```
 
-Animation above would be executed for the transition between homepage (/) and documentation page (/documentation). Notice that for the lack of route, keyword "homepage" is used. 
+The animation above would be executed for the transition between homepage (/) and documentation page (/documentation). Notice that for the lack of route, keyword "homepage" is used. 
 Any of the two routes can also be defined by wildcard symbol (`homepage>*` or `*>documentation`). 
 The most fitting animation is always chosen. 
 
 ## Custom animation to dynamic pages
-Similarly as swup, where `data-swup-class` attribute of link is used for assigning special class to the html tag, swupjs uses the same attribute for choosing custom animation.
+Similarly to swup, where `data-swup-class` attribute of the clicked link is used for assigning a special class to the html tag, swupjs uses the same attribute for choosing custom animation.
 In case the attribute is defined on clicked link, swupjs also tests the animation object for the content of the data attribute.
 So following attribute `data-swup-class="post"` would end up in `*>post` being executed.
 
