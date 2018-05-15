@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "babel --presets es2015,stage-0 -d lib/ src/",
+    "build": "webpack-cli",
     "prepublish": "npm run compile"
   },
   "author": "Georgy Marchuk",
@@ -22,8 +23,12 @@
   ],
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.4",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1"
+    "babel-preset-stage-0": "^6.24.1",
+    "uglifyjs-webpack-plugin": "^1.2.5",
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3"
   },
   "dependencies": {
     "swup": "^0.2.5"
