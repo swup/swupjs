@@ -12,6 +12,12 @@ This is not necessary. However, if we want to take advantage of high performance
 npm install swupjs
 ```
 
+or include the file from the dist folder
+
+```html
+<script src="./dist/swup.js"></script>
+```
+
 ## How it works
 Swupjs is enabled similarly as swup.
 ```javascript
