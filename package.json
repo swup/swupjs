@@ -1,6 +1,6 @@
 {
   "name": "swupjs",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Animated page transitions with JavaScript - swup extension.",
   "main": "lib/index.js",
   "scripts": {
@@ -31,6 +31,6 @@
     "webpack-cli": "^2.1.3"
   },
   "dependencies": {
-    "swup": "^0.2.5"
+    "swup": "^0.2.8"
   }
 }
