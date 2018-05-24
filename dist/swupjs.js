@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -367,6 +367,45 @@ module.exports = function (url, popstate) {
 "use strict";
 
 
+module.exports = function (str) {
+    if (this.options.debugMode) {
+        console.log(str + '%c', 'color: #009ACD');
+    }
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (plugin, options) {
+    var _this = this;
+
+    options = Object.assign({}, plugin.options, options);
+
+    plugin.options = options;
+
+    var getCurrentPageHtml = function getCurrentPageHtml() {
+        var page = _this.cache.getPage(window.location.pathname + window.location.search);
+        var html = document.createElement('html');
+        html.innerHTML = page.originalContent;
+        return html;
+    };
+
+    this.plugins.push(plugin);
+    plugin.exec(options, this, getCurrentPageHtml);
+    return this.plugins;
+};
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _Link = __webpack_require__(0);
 
 var _Link2 = _interopRequireDefault(_Link);
@@ -403,7 +442,7 @@ module.exports = function (eventName) {
 };
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -431,7 +470,7 @@ module.exports = function (from, to, custom) {
 };
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -455,7 +494,7 @@ module.exports = function (element) {
 };
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -481,7 +520,7 @@ module.exports = function (popstate) {
 };
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -500,7 +539,7 @@ module.exports = function (text) {
 };
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -586,7 +625,7 @@ module.exports = function (element, to) {
 };
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -597,7 +636,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -612,7 +651,7 @@ module.exports = function (eventName) {
 };
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -626,7 +665,7 @@ module.exports = function (url) {
 };
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -640,7 +679,7 @@ module.exports = function (page, popstate) {
 };
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -700,7 +739,11 @@ module.exports = function (page, popstate) {
     var promises = [];
     forEach.call(animatedElements, function (element) {
         var promise = new Promise(function (resolve) {
-            element.addEventListener(_this.transitionEndEvent, resolve);
+            element.addEventListener(_this.transitionEndEvent, function (event) {
+                if (element == event.target) {
+                    resolve();
+                }
+            });
         });
         promises.push(promise);
     });
@@ -725,7 +768,7 @@ module.exports = function (page, popstate) {
 };
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -757,7 +800,11 @@ module.exports = function (url, popstate) {
         var animatedElements = document.querySelectorAll(this.options.animationSelector);
         forEach.call(animatedElements, function (element) {
             var promise = new Promise(function (resolve) {
-                element.addEventListener(_this.transitionEndEvent, resolve);
+                element.addEventListener(_this.transitionEndEvent, function (event) {
+                    if (element == event.target) {
+                        resolve();
+                    }
+                });
             });
             animationPromises.push(promise);
         });
@@ -818,7 +865,7 @@ module.exports = function (url, popstate) {
 };
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -853,7 +900,7 @@ module.exports = function (html) {
 };
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -879,7 +926,7 @@ module.exports = function (location, callback) {
 };
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -905,7 +952,7 @@ module.exports = function transitionEnd() {
 };
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -978,7 +1025,7 @@ var Cache = function () {
 exports.default = Cache;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports) {
 
 /**
@@ -1013,7 +1060,7 @@ var detectie = function() {
 module.exports = detectie;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 var DOCUMENT_NODE_TYPE = 9;
@@ -1052,10 +1099,10 @@ module.exports = closest;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(22);
+var closest = __webpack_require__(24);
 
 /**
  * Delegates event to a selector.
@@ -1136,7 +1183,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1156,15 +1203,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
 // modules
 
 
-var _delegate = __webpack_require__(23);
+var _delegate = __webpack_require__(25);
 
 var _delegate2 = _interopRequireDefault(_delegate);
 
-var _detectie = __webpack_require__(21);
+var _detectie = __webpack_require__(23);
 
 var _detectie2 = _interopRequireDefault(_detectie);
 
-var _Cache = __webpack_require__(20);
+var _Cache = __webpack_require__(22);
 
 var _Cache2 = _interopRequireDefault(_Cache);
 
@@ -1172,65 +1219,73 @@ var _Link = __webpack_require__(0);
 
 var _Link2 = _interopRequireDefault(_Link);
 
-var _transitionEnd = __webpack_require__(19);
+var _transitionEnd = __webpack_require__(21);
 
 var _transitionEnd2 = _interopRequireDefault(_transitionEnd);
 
-var _request = __webpack_require__(18);
+var _request = __webpack_require__(20);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _getDataFromHtml = __webpack_require__(17);
+var _getDataFromHtml = __webpack_require__(19);
 
 var _getDataFromHtml2 = _interopRequireDefault(_getDataFromHtml);
 
-var _loadPage = __webpack_require__(16);
+var _loadPage = __webpack_require__(18);
 
 var _loadPage2 = _interopRequireDefault(_loadPage);
 
-var _renderPage = __webpack_require__(15);
+var _renderPage = __webpack_require__(17);
 
 var _renderPage2 = _interopRequireDefault(_renderPage);
 
-var _goBack = __webpack_require__(14);
+var _goBack = __webpack_require__(16);
 
 var _goBack2 = _interopRequireDefault(_goBack);
 
-var _createState = __webpack_require__(13);
+var _createState = __webpack_require__(15);
 
 var _createState2 = _interopRequireDefault(_createState);
 
-var _triggerEvent = __webpack_require__(12);
+var _triggerEvent = __webpack_require__(14);
 
 var _triggerEvent2 = _interopRequireDefault(_triggerEvent);
 
-var _getUrl = __webpack_require__(11);
+var _getUrl = __webpack_require__(13);
 
 var _getUrl2 = _interopRequireDefault(_getUrl);
 
-var _scrollTo = __webpack_require__(10);
+var _scrollTo = __webpack_require__(12);
 
 var _scrollTo2 = _interopRequireDefault(_scrollTo);
 
-var _classify = __webpack_require__(9);
+var _classify = __webpack_require__(11);
 
 var _classify2 = _interopRequireDefault(_classify);
 
-var _doScrolling = __webpack_require__(8);
+var _doScrolling = __webpack_require__(10);
 
 var _doScrolling2 = _interopRequireDefault(_doScrolling);
 
-var _markSwupElements = __webpack_require__(7);
+var _markSwupElements = __webpack_require__(9);
 
 var _markSwupElements2 = _interopRequireDefault(_markSwupElements);
 
-var _updateTransition = __webpack_require__(6);
+var _updateTransition = __webpack_require__(8);
 
 var _updateTransition2 = _interopRequireDefault(_updateTransition);
 
-var _preloadPages = __webpack_require__(5);
+var _preloadPages = __webpack_require__(7);
 
 var _preloadPages2 = _interopRequireDefault(_preloadPages);
+
+var _usePlugin = __webpack_require__(6);
+
+var _usePlugin2 = _interopRequireDefault(_usePlugin);
+
+var _log = __webpack_require__(5);
+
+var _log2 = _interopRequireDefault(_log);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1257,6 +1312,7 @@ var Swup = function () {
             preload: true,
             support: true,
             disableIE: false,
+            plugins: [],
 
             LINK_SELECTOR: 'a[href^="/"]:not([data-no-swup]), a[href^="#"]:not([data-no-swup]), a[xlink\\:href]'
 
@@ -1278,6 +1334,8 @@ var Swup = function () {
         this.preloadPromise = null;
         // save options
         this.options = options;
+        // plugins array
+        this.plugins = [];
 
         /**
          * make modules accessible in instance
@@ -1299,6 +1357,8 @@ var Swup = function () {
         this.markSwupElements = _markSwupElements2.default;
         this.updateTransition = _updateTransition2.default;
         this.preloadPages = _preloadPages2.default;
+        this.usePlugin = _usePlugin2.default;
+        this.log = _log2.default;
         this.detectie = _detectie2.default;
         this.enable = this.enable;
         this.destroy = this.destroy;
@@ -1322,6 +1382,8 @@ var Swup = function () {
     _createClass(Swup, [{
         key: 'enable',
         value: function enable() {
+            var _this = this;
+
             /**
              * support check
              */
@@ -1372,7 +1434,7 @@ var Swup = function () {
             /**
              * initial save to cache
              */
-            var page = this.getDataFromHtml(document.documentElement.innerHTML);
+            var page = this.getDataFromHtml(document.documentElement.outerHTML);
             page.url = this.currentUrl;
             if (this.options.cache) {
                 this.cache.cacheUrl(page, this.options.debugMode);
@@ -1382,6 +1444,13 @@ var Swup = function () {
              * mark swup blocks in html
              */
             this.markSwupElements(document.documentElement);
+
+            /**
+             * enable plugins from options
+             */
+            this.options.plugins.forEach(function (item) {
+                return _this.usePlugin(item);
+            });
 
             /**
              * trigger enabled event
@@ -1469,7 +1538,7 @@ var Swup = function () {
     }, {
         key: 'linkMouseoverHandler',
         value: function linkMouseoverHandler(event) {
-            var _this = this;
+            var _this2 = this;
 
             this.triggerEvent('hoverLink');
             if (this.options.preload) {
@@ -1477,19 +1546,19 @@ var Swup = function () {
                 link.setPath(event.delegateTarget.href);
                 if (link.getAddress() != this.currentUrl && !this.cache.exists(link.getAddress()) && this.preloadPromise == null) {
                     this.preloadPromise = new Promise(function (resolve) {
-                        _this.getPage(link.getAddress(), function (response) {
+                        _this2.getPage(link.getAddress(), function (response) {
                             if (response === null) {
                                 console.warn('Server error.');
-                                _this.triggerEvent('serverError');
+                                _this2.triggerEvent('serverError');
                             } else {
                                 // get json data
-                                var page = _this.getDataFromHtml(response);
+                                var page = _this2.getDataFromHtml(response);
                                 page.url = link.getAddress();
-                                _this.cache.cacheUrl(page, _this.options.debugMode);
-                                _this.triggerEvent('pagePreloaded');
+                                _this2.cache.cacheUrl(page, _this2.options.debugMode);
+                                _this2.triggerEvent('pagePreloaded');
                             }
                             resolve();
-                            _this.preloadPromise = null;
+                            _this2.preloadPromise = null;
                         });
                     });
                     this.preloadPromise.route = link.getAddress();
@@ -1517,7 +1586,7 @@ var Swup = function () {
 exports.default = Swup;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1529,7 +1598,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _swup = __webpack_require__(24);
+var _swup = __webpack_require__(26);
 
 var _swup2 = _interopRequireDefault(_swup);
 
@@ -1604,13 +1673,13 @@ var Swupjs = function (_Swup) {
 exports.default = Swupjs;
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _index = __webpack_require__(25);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 
