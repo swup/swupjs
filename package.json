@@ -1,6 +1,6 @@
 {
   "name": "swupjs",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Animated page transitions with JavaScript - swup extension.",
   "main": "lib/index.js",
   "scripts": {
