@@ -1,5 +1,5 @@
 
-module.exports = function (url, popstate) {
+module.exports = function (data, popstate) {
     var finalPage = null
 
     // scrolling
@@ -13,7 +13,7 @@ module.exports = function (url, popstate) {
         // start animation
         document.documentElement.classList.add('is-changing')
         document.documentElement.classList.add('is-leaving')
-        document.documentElement.classList.add('to-' + this.classify(url))
+        document.documentElement.classList.add('to-' + this.classify(data.url))
 
         // animation promise
         let animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'out'))
@@ -27,9 +27,9 @@ module.exports = function (url, popstate) {
 
         // create pop element with or without anchor
         if (this.scrollToElement != null) {
-            var pop = url + this.scrollToElement;
+            var pop = data.url + this.scrollToElement;
         } else {
-            var pop = url;
+            var pop = data.url;
         }
         this.createState(pop)
     } else {
@@ -37,15 +37,15 @@ module.exports = function (url, popstate) {
         this.triggerEvent('animationSkipped')
     }
 
-    if (this.cache.exists(url)) {
+    if (this.cache.exists(data.url)) {
         var xhrPromise = new Promise(resolve => {
             resolve()
         })
         this.triggerEvent('pageRetrievedFromCache')
     } else {
-        if (!this.preloadPromise || this.preloadPromise.route != url) {
+        if (!this.preloadPromise || this.preloadPromise.route != data.url) {
             var xhrPromise = new Promise(resolve => {
-                this.getPage(url, response => {
+                this.getPage(data, response => {
                     if (response === null) {
                         console.warn('Server error.')
                         this.triggerEvent('serverError')
@@ -53,7 +53,7 @@ module.exports = function (url, popstate) {
                     } else {
                         // get json data
                         var page = this.getDataFromHtml(response)
-                        page.url = url
+                        page.url = data.url
                         // render page
                         this.cache.cacheUrl(page, this.options.debugMode)
                         this.triggerEvent('pageLoaded')
@@ -69,7 +69,7 @@ module.exports = function (url, popstate) {
     Promise
         .all(animationPromises.concat([xhrPromise]))
         .then(() => {
-            finalPage = this.cache.getPage(url)
+            finalPage = this.cache.getPage(data.url)
             if (!this.options.cache) {
                 this.cache.empty(this.options.debugMode)
             }
