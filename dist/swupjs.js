@@ -233,6 +233,10 @@ module.exports = function (page, popstate) {
     this.triggerEvent('contentReplaced');
     this.triggerEvent('pageView');
 
+    if (!this.options.cache) {
+        this.cache.empty(this.options.debugMode);
+    }
+
     // handle classes after render
     if (this.options.pageClassPrefix !== false) {
         document.body.className.split(' ').forEach(function (className) {
@@ -356,9 +360,6 @@ module.exports = function (data, popstate) {
 
     Promise.all(animationPromises.concat([xhrPromise])).then(function () {
         finalPage = _this.cache.getPage(data.url);
-        if (!_this.options.cache) {
-            _this.cache.empty(_this.options.debugMode);
-        }
         _this.renderPage(finalPage, popstate);
         _this.preloadPromise = null;
     });
