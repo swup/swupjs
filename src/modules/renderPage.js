@@ -19,6 +19,10 @@ module.exports = function (page, popstate) {
     this.triggerEvent('contentReplaced')
     this.triggerEvent('pageView')
 
+    if (!this.options.cache) {
+        this.cache.empty(this.options.debugMode)
+    }
+
     // handle classes after render
     if (this.options.pageClassPrefix !== false) {
         document.body.className.split(' ').forEach(className => {

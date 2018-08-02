@@ -70,9 +70,6 @@ module.exports = function (data, popstate) {
         .all(animationPromises.concat([xhrPromise]))
         .then(() => {
             finalPage = this.cache.getPage(data.url)
-            if (!this.options.cache) {
-                this.cache.empty(this.options.debugMode)
-            }
             this.renderPage(finalPage, popstate)
             this.preloadPromise = null
         })
