@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1055,41 +1055,6 @@ exports.default = Cache;
 /* 23 */
 /***/ (function(module, exports) {
 
-/**
- * detect IE
- * returns version of IE or false, if browser is not Internet Explorer
- */
-var detectie = function() {
-    var ua = window.navigator.userAgent;
-
-    var msie = ua.indexOf('MSIE ');
-    if (msie > 0) {
-        // IE 10 or older => return version number
-        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-    }
-
-    var trident = ua.indexOf('Trident/');
-    if (trident > 0) {
-        // IE 11 => return version number
-        var rv = ua.indexOf('rv:');
-        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-    }
-
-    var edge = ua.indexOf('Edge/');
-    if (edge > 0) {
-       // IE 12 => return version number
-       return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-    }
-    // other browser
-    return false;
-}
-
-module.exports = detectie;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports) {
-
 var DOCUMENT_NODE_TYPE = 9;
 
 /**
@@ -1126,10 +1091,10 @@ module.exports = closest;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(24);
+var closest = __webpack_require__(23);
 
 /**
  * Delegates event to a selector.
@@ -1210,7 +1175,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1230,13 +1195,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 // modules
 
 
-var _delegate = __webpack_require__(25);
+var _delegate = __webpack_require__(24);
 
 var _delegate2 = _interopRequireDefault(_delegate);
-
-var _detectie = __webpack_require__(23);
-
-var _detectie2 = _interopRequireDefault(_detectie);
 
 var _Cache = __webpack_require__(22);
 
@@ -1338,7 +1299,6 @@ var Swup = function () {
 
             preload: true,
             support: true,
-            disableIE: false,
             plugins: [],
 
             skipPopStateHandling: function skipPopStateHandling(event) {
@@ -1394,7 +1354,6 @@ var Swup = function () {
         this.preloadPages = _preloadPages2.default;
         this.usePlugin = _usePlugin2.default;
         this.log = _log2.default;
-        this.detectie = _detectie2.default;
         this.enable = this.enable;
         this.destroy = this.destroy;
 
@@ -1440,12 +1399,6 @@ var Swup = function () {
                     console.warn('Promise is not supported');
                     return;
                 }
-            }
-            /**
-             * disable IE
-             */
-            if (this.options.disableIE && this.detectie()) {
-                return;
             }
 
             // variable to keep event listeners from "delegate"
@@ -1699,7 +1652,7 @@ var Swup = function () {
 exports.default = Swup;
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1711,7 +1664,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _swup = __webpack_require__(26);
+var _swup = __webpack_require__(25);
 
 var _swup2 = _interopRequireDefault(_swup);
 
@@ -1786,13 +1739,13 @@ var Swupjs = function (_Swup) {
 exports.default = Swupjs;
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _index = __webpack_require__(27);
+var _index = __webpack_require__(26);
 
 var _index2 = _interopRequireDefault(_index);
 
