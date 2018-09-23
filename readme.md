@@ -4,18 +4,15 @@ Swupjs is an extension of [swup](https://github.com/gmrchk/swup), which modifies
 Swupjs only slightly modifies swup, where all the capabilities of swup remain the same, with only one exception - timing and animations are based on JavaScript, not CSS transitions. 
 For more information about functionality and idea of swupjs, refer to [swup](https://github.com/gmrchk/swup) documentation.
 
-`is-animating` class on html tag is no longer present in the lifecycle of page transition. 
-This is not necessary. However, if we want to take advantage of high performance brought by JavaScript animations, we should not degrade it by combining it with CSS animation.
-
 ## Installation
-```shell
+```bash
 npm install swupjs
 ```
 
 or include the file from the dist folder
 
 ```html
-<script src="./dist/swup.js"></script>
+<script src="./dist/swupjs.js"></script>
 ```
 
 ## How it works
@@ -42,8 +39,8 @@ animations: {
 ```
 
 The example above is the default setup in swupjs and defines two animations, where **out** is the animation (function) being executed before content replace, and **in** is animation being executed after the content is replaced.
-As one may have noticed, one parameter is passed into both functions. Call of `next` function serves as an indicator, that animation is done - so in a real world `next()` would be called as a callback of the animation. 
-
+As one may have noticed, one parameter is passed into both functions.
+Call of `next` function serves as an indicator, that animation is done - so in a real world `next()` would be called as a callback of the animation.
 As you can see, by default no animation is being executed and `next()` is called right away. 
 
 **Note:** Although the whole purpose of swup is to enable page transitions, this can still enhance your user experience even without the animation as it can shorten your load time drastically when preload and/or cache options are set to `true`. In most cases, your page change should be immediate without any wait time.
@@ -73,6 +70,33 @@ let options = {
 const swupjs = new Swupjs(options)
 ```
 
+Basic usage with tools like GSAP would look something like the following:
+```javascript
+let options = {
+    animations: {
+        '*': {
+            in: function(next){
+                document.querySelector('#swup').style.opacity = 0;
+                TweenLite.to(document.querySelector('#swup'), .5, {
+                    opacity: 1,
+                    onComplete: next
+                });
+            },
+            out: function(next){
+                document.querySelector('#swup').style.opacity = 1;
+                TweenLite.to(document.querySelector('#swup'), .5, {
+                    opacity: 0,
+                    onComplete: next
+                });
+            }
+        },
+    }
+}
+
+const swupjs = new Swupjs(options);
+```
+
+
 ## Choosing the animation 
 As one may have noticed, the name of animation object in options is defined as `'*'`, which serves as a fallback or base set of animations used throughout the website. 
 Custom animations can be defined for a transition between any pages, where the name is defined by `[starting route]>[final route]`. 
@@ -90,7 +114,8 @@ Custom animations can be defined for a transition between any pages, where the n
 ...
 ```
 
-The animation above would be executed for the transition between homepage (/) and documentation page (/documentation). Notice that for the lack of route, keyword "homepage" is used. 
+The animation above would be executed for the transition between homepage (/) and documentation page (/documentation).
+Notice that for the lack of route, keyword "homepage" is used.
 Any of the two routes can also be defined by wildcard symbol (`homepage>*` or `*>documentation`). 
 The most fitting animation is always chosen. 
 
