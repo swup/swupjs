@@ -45,15 +45,20 @@ module.exports = function (data, popstate) {
     } else {
         if (!this.preloadPromise || this.preloadPromise.route != data.url) {
             var xhrPromise = new Promise(resolve => {
-                this.getPage(data, response => {
-                    if (response === null) {
-                        console.warn('Server error.')
+                this.getPage(data, (response, request) => {
+                    if (request.status === 500) {
                         this.triggerEvent('serverError')
-                        this.goBack()
+                        reject(data.url)
+                        return;
                     } else {
                         // get json data
                         var page = this.getDataFromHtml(response)
-                        page.url = data.url
+                        if (page != null) {
+                            page.url = data.url
+                        } else {
+                            reject(data.url)
+                            return;
+                        }
                         // render page
                         this.cache.cacheUrl(page, this.options.debugMode)
                         this.triggerEvent('pageLoaded')
@@ -73,4 +78,14 @@ module.exports = function (data, popstate) {
             this.renderPage(finalPage, popstate)
             this.preloadPromise = null
         })
+        .catch(errorUrl => {
+                // rewrite the skipPopStateHandling function to redirect manually when the history.go is processed
+                this.options.skipPopStateHandling = function () {
+                window.location = errorUrl
+                return true
+            }
+
+            // go back to the actual page were still at
+            window.history.go(-1)
+        });
 }

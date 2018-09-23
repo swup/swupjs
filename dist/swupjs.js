@@ -337,15 +337,20 @@ module.exports = function (data, popstate) {
     } else {
         if (!this.preloadPromise || this.preloadPromise.route != data.url) {
             var xhrPromise = new Promise(function (resolve) {
-                _this.getPage(data, function (response) {
-                    if (response === null) {
-                        console.warn('Server error.');
+                _this.getPage(data, function (response, request) {
+                    if (request.status === 500) {
                         _this.triggerEvent('serverError');
-                        _this.goBack();
+                        reject(data.url);
+                        return;
                     } else {
                         // get json data
                         var page = _this.getDataFromHtml(response);
-                        page.url = data.url;
+                        if (page != null) {
+                            page.url = data.url;
+                        } else {
+                            reject(data.url);
+                            return;
+                        }
                         // render page
                         _this.cache.cacheUrl(page, _this.options.debugMode);
                         _this.triggerEvent('pageLoaded');
@@ -362,6 +367,15 @@ module.exports = function (data, popstate) {
         finalPage = _this.cache.getPage(data.url);
         _this.renderPage(finalPage, popstate);
         _this.preloadPromise = null;
+    }).catch(function (errorUrl) {
+        // rewrite the skipPopStateHandling function to redirect manually when the history.go is processed
+        _this.options.skipPopStateHandling = function () {
+            window.location = errorUrl;
+            return true;
+        };
+
+        // go back to the actual page were still at
+        window.history.go(-1);
     });
 };
 
@@ -555,17 +569,14 @@ module.exports = function (element, to) {
 
     var animatedScroll = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.options.animateScroll;
 
-    var body = document.body;
-
-    var UP = -1;
-    var DOWN = 1;
-
     var friction = 1 - this.options.scrollFriction;
     var acceleration = this.options.scrollAcceleration;
 
-    var positionY = 100;
+    var positionY = 0;
     var velocityY = 0;
-    var targetPositionY = 400;
+    var targetPositionY = 0;
+    var targetPositionYWithOffset = 0;
+    var direction = 0;
 
     var raf = null;
 
@@ -577,15 +588,16 @@ module.exports = function (element, to) {
         var distance = update();
         render();
 
-        if (Math.abs(distance) > 0.1) {
+        if (direction === 1 && targetPositionY > positionY || direction === -1 && targetPositionY < positionY) {
             raf = requestAnimationFrame(animate);
         } else {
+            window.scrollTo(0, targetPositionY);
             _this.triggerEvent('scrollDone');
         }
     };
 
     function update() {
-        var distance = targetPositionY - positionY;
+        var distance = targetPositionYWithOffset - positionY;
         var attraction = distance * acceleration;
 
         applyForce(attraction);
@@ -615,9 +627,15 @@ module.exports = function (element, to) {
 
     var scrollTo = function scrollTo(offset, callback) {
         positionY = getScrollTop();
+        direction = positionY > offset ? -1 : 1;
+        targetPositionYWithOffset = offset + direction;
         targetPositionY = offset;
         velocityY = 0;
-        animate();
+        if (positionY != targetPositionY) {
+            animate();
+        } else {
+            _this.triggerEvent('scrollDone');
+        }
     };
 
     this.triggerEvent('scrollStart');
@@ -843,16 +861,21 @@ module.exports = function (data, popstate) {
         this.triggerEvent('pageRetrievedFromCache');
     } else {
         if (!this.preloadPromise || this.preloadPromise.route != data.url) {
-            var xhrPromise = new Promise(function (resolve) {
-                _this.getPage(data, function (response) {
-                    if (response === null) {
-                        console.warn('Server error.');
+            var xhrPromise = new Promise(function (resolve, reject) {
+                _this.getPage(data, function (response, request) {
+                    if (request.status === 500) {
                         _this.triggerEvent('serverError');
-                        _this.goBack();
+                        reject(data.url);
+                        return;
                     } else {
                         // get json data
                         var page = _this.getDataFromHtml(response);
-                        page.url = data.url;
+                        if (page != null) {
+                            page.url = data.url;
+                        } else {
+                            reject(data.url);
+                            return;
+                        }
                         // render page
                         _this.cache.cacheUrl(page, _this.options.debugMode);
                         _this.triggerEvent('pageLoaded');
@@ -869,6 +892,15 @@ module.exports = function (data, popstate) {
         finalPage = _this.cache.getPage(data.url);
         _this.renderPage(finalPage, popstate);
         _this.preloadPromise = null;
+    }).catch(function (errorUrl) {
+        // rewrite the skipPopStateHandling function to redirect manually when the history.go is processed
+        _this.options.skipPopStateHandling = function () {
+            window.location = errorUrl;
+            return true;
+        };
+
+        // go back to the actual page were still at
+        window.history.go(-1);
     });
 };
 
@@ -889,7 +921,8 @@ module.exports = function (html) {
 
     for (var i = 0; i < this.options.elements.length; i++) {
         if (fakeDom.querySelector(this.options.elements[i]) == null) {
-            console.warn('Element ' + this.options.elements[i] + ' is not found cached page.');
+            console.warn('Element ' + this.options.elements[i] + ' is not found in cached page.');
+            return null;
         } else {
             [].forEach.call(document.body.querySelectorAll(this.options.elements[i]), function (item, index) {
                 fakeDom.querySelectorAll(_this.options.elements[i])[index].dataset.swup = blocks.length;
@@ -1284,7 +1317,7 @@ var Swup = function () {
         // default options
         var defaults = {
             cache: true,
-            animationSelector: '[class^="a-"]',
+            animationSelector: '[class*="transition-"]',
             elements: ['#swup'],
             pageClassPrefix: '',
             debugMode: false,
@@ -1306,7 +1339,7 @@ var Swup = function () {
                 return true;
             },
 
-            LINK_SELECTOR: 'a[href^="/"]:not([data-no-swup]), a[href^="#"]:not([data-no-swup]), a[xlink\\:href]',
+            LINK_SELECTOR: 'a[href^="' + window.location.origin + '"]:not([data-no-swup]), a[href^="/"]:not([data-no-swup]), a[href^="#"]:not([data-no-swup])',
             FORM_SELECTOR: 'form[data-swup-form]'
 
             /**
@@ -1545,17 +1578,23 @@ var Swup = function () {
                 var link = new _Link2.default();
                 link.setPath(event.delegateTarget.href);
                 if (link.getAddress() != this.currentUrl && !this.cache.exists(link.getAddress()) && this.preloadPromise == null) {
-                    this.preloadPromise = new Promise(function (resolve) {
-                        _this2.getPage({ url: link.getAddress() }, function (response) {
-                            if (response === null) {
-                                console.warn('Server error.');
+                    this.preloadPromise = new Promise(function (resolve, reject) {
+                        _this2.getPage({ url: link.getAddress() }, function (response, request) {
+                            if (request.status === 500) {
                                 _this2.triggerEvent('serverError');
+                                reject(link.getAddress());
+                                return;
                             } else {
                                 // get json data
                                 var page = _this2.getDataFromHtml(response);
-                                page.url = link.getAddress();
-                                _this2.cache.cacheUrl(page, _this2.options.debugMode);
-                                _this2.triggerEvent('pagePreloaded');
+                                if (page != null) {
+                                    page.url = link.getAddress();
+                                    _this2.cache.cacheUrl(page, _this2.options.debugMode);
+                                    _this2.triggerEvent('pagePreloaded');
+                                } else {
+                                    reject(link.getAddress());
+                                    return;
+                                }
                             }
                             resolve();
                             _this2.preloadPromise = null;
