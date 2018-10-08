@@ -2,7 +2,7 @@ const { forEach } = Array.prototype;
 
 module.exports = function (page, popstate) {
     document.documentElement.classList.remove('is-leaving')
-    if (!popstate) {
+    if (!popstate || this.options.animateHistoryBrowsing) {
         document.documentElement.classList.add('is-rendering')
     }
 
@@ -49,7 +49,7 @@ module.exports = function (page, popstate) {
 
     // detect animation end
     let animationPromises = []
-    if (!popstate) {
+    if (!popstate || this.options.animateHistoryBrowsing) {
         let animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'in'))
         animationPromises.push(animationPromise)
     }
@@ -59,13 +59,11 @@ module.exports = function (page, popstate) {
         .then(() => {
             this.triggerEvent('animationInDone')
             // remove "to-{page}" classes
-            document.documentElement.classList.forEach(classItem => {
-                if (classItem.startsWith('to-')) {
-                    document.documentElement.classList.remove(classItem)
+            document.documentElement.className.split(' ').forEach(classItem => {
+                if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
+                    document.documentElement.classList.remove(classItem);
                 }
-            })
-            document.documentElement.classList.remove('is-changing')
-            document.documentElement.classList.remove('is-rendering')
+            });
         })
 
     // update current url
