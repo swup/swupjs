@@ -56,7 +56,7 @@ module.exports = function (data, popstate) {
                         return;
                     } else {
                         // get json data
-                        var page = this.getDataFromHtml(response)
+                        var page = this.getDataFromHtml(response, request)
                         if (page != null) {
                             page.url = data.url
                         } else {

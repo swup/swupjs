@@ -209,6 +209,12 @@ module.exports = function (transition, animations, type) {
 "use strict";
 
 
+var _Link = __webpack_require__(0);
+
+var _Link2 = _interopRequireDefault(_Link);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var forEach = Array.prototype.forEach;
 
 
@@ -216,6 +222,19 @@ module.exports = function (page, popstate) {
     var _this = this;
 
     document.documentElement.classList.remove('is-leaving');
+
+    // replace state in case the url was redirected
+    var link = new _Link2.default();
+    link.setPath(page.responseURL);
+
+    if (window.location.pathname !== link.getPath()) {
+        window.history.replaceState({
+            url: link.getPath(),
+            random: Math.random(),
+            source: "swup"
+        }, document.title, link.getPath());
+    }
+
     if (!popstate || this.options.animateHistoryBrowsing) {
         document.documentElement.classList.add('is-rendering');
     }
@@ -345,7 +364,7 @@ module.exports = function (data, popstate) {
                         return;
                     } else {
                         // get json data
-                        var page = _this.getDataFromHtml(response);
+                        var page = _this.getDataFromHtml(response, request);
                         if (page != null) {
                             page.url = data.url;
                         } else {
@@ -432,7 +451,7 @@ var _Link2 = _interopRequireDefault(_Link);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = function (eventName) {
+module.exports = function () {
     var _this = this;
 
     if (this.options.preload) {
@@ -440,16 +459,18 @@ module.exports = function (eventName) {
             var link = new _Link2.default();
             link.setPath(pathname);
             if (link.getAddress() != _this.currentUrl && !_this.cache.exists(link.getAddress()) && _this.preloadPromise == null) {
-                _this.getPage({ url: link.getAddress() }, function (response) {
-                    if (response === null) {
-                        console.warn('Server error.');
+                _this.getPage({ url: link.getAddress() }, function (response, request) {
+                    if (request.status === 500) {
                         _this.triggerEvent('serverError');
+                        return;
                     } else {
                         // get json data
-                        var page = _this.getDataFromHtml(response);
-                        page.url = link.getAddress();
-                        _this.cache.cacheUrl(page, _this.options.debugMode);
-                        _this.triggerEvent('pagePreloaded');
+                        var page = _this.getDataFromHtml(response, request);
+                        if (page != null) {
+                            page.url = link.getAddress();
+                            _this.cache.cacheUrl(page, _this.options.debugMode);
+                            _this.triggerEvent('pagePreloaded');
+                        }
                     }
                 });
             }
@@ -708,6 +729,12 @@ module.exports = function (page, popstate) {
 "use strict";
 
 
+var _Link = __webpack_require__(0);
+
+var _Link2 = _interopRequireDefault(_Link);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var forEach = Array.prototype.forEach;
 
 
@@ -715,6 +742,18 @@ module.exports = function (page, popstate) {
     var _this = this;
 
     document.documentElement.classList.remove('is-leaving');
+
+    // replace state in case the url was redirected
+    var link = new _Link2.default();
+    link.setPath(page.responseURL);
+
+    if (window.location.pathname !== link.getPath()) {
+        window.history.replaceState({
+            url: link.getPath(),
+            random: Math.random(),
+            source: "swup"
+        }, document.title, link.getPath());
+    }
 
     // only add for non-popstate transitions
     if (!popstate || this.options.animateHistoryBrowsing) {
@@ -793,6 +832,8 @@ module.exports = function (page, popstate) {
 
     // update current url
     this.getUrl();
+    // reset scroll-to element
+    this.scrollToElement = null;
 };
 
 /***/ }),
@@ -871,7 +912,7 @@ module.exports = function (data, popstate) {
                         return;
                     } else {
                         // get json data
-                        var page = _this.getDataFromHtml(response);
+                        var page = _this.getDataFromHtml(response, request);
                         if (page != null) {
                             page.url = data.url;
                         } else {
@@ -913,7 +954,7 @@ module.exports = function (data, popstate) {
 "use strict";
 
 
-module.exports = function (html) {
+module.exports = function (html, request) {
     var _this = this;
 
     var content = html.replace('<body', '<div id="swupBody"').replace('</body>', '</div>');
@@ -937,7 +978,8 @@ module.exports = function (html) {
         title: fakeDom.querySelector('title').innerText,
         pageClass: fakeDom.querySelector('#swupBody').className,
         originalContent: html,
-        blocks: blocks
+        blocks: blocks,
+        responseURL: request != null ? request.responseURL : window.location.href
     };
     return json;
 };
@@ -1550,7 +1592,11 @@ var Swup = function () {
                                 var top = element.getBoundingClientRect().top + window.pageYOffset;
                                 this.scrollTo(document.body, top);
                             }
-                            history.replaceState(undefined, undefined, link.getHash());
+                            history.replaceState({
+                                url: link.getAddress() + link.getHash(),
+                                random: Math.random(),
+                                source: "swup"
+                            }, document.title, link.getAddress() + link.getHash());
                         } else {
                             console.warn('Element for offset not found (' + link.getHash() + ')');
                         }
@@ -1596,7 +1642,7 @@ var Swup = function () {
                                 return;
                             } else {
                                 // get json data
-                                var page = _this2.getDataFromHtml(response);
+                                var page = _this2.getDataFromHtml(response, request);
                                 if (page != null) {
                                     page.url = link.getAddress();
                                     _this2.cache.cacheUrl(page, _this2.options.debugMode);
@@ -1688,6 +1734,7 @@ var Swup = function () {
             } else {
                 event.preventDefault();
             }
+            console.log(event.state);
             this.triggerEvent('popState');
             this.loadPage({ url: link.getAddress() }, event);
         }
