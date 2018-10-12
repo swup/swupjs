@@ -71,6 +71,9 @@ module.exports = function (page, popstate) {
         animationPromises.push(animationPromise)
     }
 
+    //preload pages if possible
+    this.preloadPages()
+
     Promise
         .all(animationPromises)
         .then(() => {
