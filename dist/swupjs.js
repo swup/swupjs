@@ -302,6 +302,8 @@ module.exports = function (page, popstate) {
 
     // update current url
     this.getUrl();
+    // reset scroll-to element
+    this.scrollToElement = null;
 };
 
 /***/ }),
@@ -1737,7 +1739,6 @@ var Swup = function () {
             } else {
                 event.preventDefault();
             }
-            console.log(event.state);
             this.triggerEvent('popState');
             this.loadPage({ url: link.getAddress() }, event);
         }
