@@ -33,14 +33,8 @@ module.exports = function (page, popstate) {
     // set title
     document.title = page.title;
 
-    this.triggerEvent('contentReplaced')
-    this.triggerEvent('pageView')
-
-    if (!this.options.cache) {
-        this.cache.empty(this.options.debugMode)
-    }
-
     // handle classes after render
+    // remove
     if (this.options.pageClassPrefix !== false) {
         document.body.className.split(' ').forEach(className => {
             // empty string for page class
@@ -50,13 +44,20 @@ module.exports = function (page, popstate) {
         })
     }
 
-    // empty string for page class
+    // add
     if (page.pageClass != "") {
         page.pageClass.split(' ').forEach(className => {
             if (className != "" && className.includes(this.options.pageClassPrefix)) {
                 document.body.classList.add(className)
             }
         })
+    }
+
+    this.triggerEvent('contentReplaced')
+    this.triggerEvent('pageView')
+
+    if (!this.options.cache) {
+        this.cache.empty(this.options.debugMode)
     }
 
     // scrolling
