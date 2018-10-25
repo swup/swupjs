@@ -11,6 +11,7 @@ module.exports = function (data, popstate) {
 
     if (!popstate || this.options.animateHistoryBrowsing) {
         // start animation
+        this.triggerEvent('animationOutStart')
         document.documentElement.classList.add('is-changing')
         document.documentElement.classList.add('is-leaving')
         if (popstate) {
@@ -26,7 +27,7 @@ module.exports = function (data, popstate) {
             .all(animationPromises)
             .then(() => {
                 this.triggerEvent('animationOutDone')
-        })
+            })
 
         // create pop element with or without anchor
         if (this.scrollToElement != null) {

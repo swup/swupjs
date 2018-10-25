@@ -284,6 +284,7 @@ module.exports = function (page, popstate) {
     // detect animation end
     var animationPromises = [];
     if (!popstate || this.options.animateHistoryBrowsing) {
+        this.triggerEvent('animationInStart');
         var animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'in'));
         animationPromises.push(animationPromise);
     }
@@ -291,15 +292,17 @@ module.exports = function (page, popstate) {
     //preload pages if possible
     this.preloadPages();
 
-    Promise.all(animationPromises).then(function () {
-        _this.triggerEvent('animationInDone');
-        // remove "to-{page}" classes
-        document.documentElement.className.split(' ').forEach(function (classItem) {
-            if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
-                document.documentElement.classList.remove(classItem);
-            }
+    if (!popstate || this.options.animateHistoryBrowsing) {
+        Promise.all(animationPromises).then(function () {
+            _this.triggerEvent('animationInDone');
+            // remove "to-{page}" classes
+            document.documentElement.className.split(' ').forEach(function (classItem) {
+                if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
+                    document.documentElement.classList.remove(classItem);
+                }
+            });
         });
-    });
+    }
 
     // update current url
     this.getUrl();
@@ -328,6 +331,7 @@ module.exports = function (data, popstate) {
 
     if (!popstate || this.options.animateHistoryBrowsing) {
         // start animation
+        this.triggerEvent('animationOutStart');
         document.documentElement.classList.add('is-changing');
         document.documentElement.classList.add('is-leaving');
         if (popstate) {

@@ -68,6 +68,7 @@ module.exports = function (page, popstate) {
     // detect animation end
     let animationPromises = []
     if (!popstate || this.options.animateHistoryBrowsing) {
+        this.triggerEvent('animationInStart')
         let animationPromise = this.createAnimationPromise(this.getAnimation(this.transition, this.animations, 'in'))
         animationPromises.push(animationPromise)
     }
@@ -75,17 +76,19 @@ module.exports = function (page, popstate) {
     //preload pages if possible
     this.preloadPages()
 
-    Promise
-        .all(animationPromises)
-        .then(() => {
-            this.triggerEvent('animationInDone')
-            // remove "to-{page}" classes
-            document.documentElement.className.split(' ').forEach(classItem => {
-                if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
-                    document.documentElement.classList.remove(classItem);
-                }
-            });
-        })
+    if (!popstate || this.options.animateHistoryBrowsing) {
+        Promise
+            .all(animationPromises)
+            .then(() => {
+                this.triggerEvent('animationInDone')
+                // remove "to-{page}" classes
+                document.documentElement.className.split(' ').forEach(classItem => {
+                    if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
+                        document.documentElement.classList.remove(classItem);
+                    }
+                })
+            })
+    }
 
     // update current url
     this.getUrl()
