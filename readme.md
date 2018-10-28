@@ -120,9 +120,9 @@ Any of the two routes can also be defined by wildcard symbol (`homepage>*` or `*
 The most fitting animation is always chosen. 
 
 ## Custom animation to dynamic pages
-Similarly to swup, where `data-swup-class` attribute of the clicked link is used for assigning a special class to the html tag, swupjs uses the same attribute for choosing custom animation.
+Similarly to swup, where `data-swup-transition` attribute of the clicked link is used for assigning a special class to the html tag, swupjs uses the same attribute for choosing custom animation.
 In case the attribute is defined on clicked link, swupjs also tests the animation object for the content of the data attribute.
-So following attribute `data-swup-class="post"` would end up in `*>post` being executed.
+So following attribute `data-swup-transition="post"` would end up in `*>post` being executed.
 
 ```javascript
 ...

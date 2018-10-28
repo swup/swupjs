@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 26);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -320,14 +320,21 @@ module.exports = function (page, popstate) {
 module.exports = function (data, popstate) {
     var _this = this;
 
-    var finalPage = null;
-
     // scrolling
     if (this.options.doScrollingRightAway && !this.scrollToElement) {
         this.doScrolling(popstate);
     }
 
+    // create array for storing animation promises
     var animationPromises = [];
+
+    // set transition object
+    if (data.customTransition != null) {
+        this.updateTransition(window.location.pathname, data.url, data.customTransition);
+        document.documentElement.classList.add('to-' + this.classify(data.customTransition));
+    } else {
+        this.updateTransition(window.location.pathname, data.url);
+    }
 
     if (!popstate || this.options.animateHistoryBrowsing) {
         // start animation
@@ -394,8 +401,7 @@ module.exports = function (data, popstate) {
     }
 
     Promise.all(animationPromises.concat([xhrPromise])).then(function () {
-        finalPage = _this.cache.getPage(data.url);
-        _this.renderPage(finalPage, popstate);
+        _this.renderPage(_this.cache.getPage(data.url), popstate);
         _this.preloadPromise = null;
     }).catch(function (errorUrl) {
         // rewrite the skipPopStateHandling function to redirect manually when the history.go is processed
@@ -725,20 +731,6 @@ module.exports = function (url) {
 "use strict";
 
 
-module.exports = function (page, popstate) {
-    setTimeout(function () {
-        document.body.classList.remove('is-changing');
-        history.back();
-    }, 100);
-};
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 var _Link = __webpack_require__(0);
 
 var _Link2 = _interopRequireDefault(_Link);
@@ -780,16 +772,8 @@ module.exports = function (page, popstate) {
     // set title
     document.title = page.title;
 
-    this.triggerEvent('contentReplaced');
-    this.triggerEvent('pageView');
-    if (!this.options.cache) {
-        this.cache.empty(this.options.debugMode);
-    }
-    setTimeout(function () {
-        document.documentElement.classList.remove('is-animating');
-    }, 10);
-
     // handle classes after render
+    // remove
     if (this.options.pageClassPrefix !== false) {
         document.body.className.split(' ').forEach(function (className) {
             // empty string for page class
@@ -798,8 +782,7 @@ module.exports = function (page, popstate) {
             }
         });
     }
-
-    // empty string for page class
+    // add
     if (page.pageClass != "") {
         page.pageClass.split(' ').forEach(function (className) {
             if (className != "" && className.includes(_this.options.pageClassPrefix)) {
@@ -807,6 +790,18 @@ module.exports = function (page, popstate) {
             }
         });
     }
+
+    this.triggerEvent('contentReplaced');
+    this.triggerEvent('pageView');
+    if (!this.options.cache) {
+        this.cache.empty(this.options.debugMode);
+    }
+    setTimeout(function () {
+        if (!popstate || _this.options.animateHistoryBrowsing) {
+            _this.triggerEvent('animationInStart');
+            document.documentElement.classList.remove('is-animating');
+        }
+    }, 10);
 
     // scrolling
     if (!this.options.doScrollingRightAway || this.scrollToElement) {
@@ -830,15 +825,17 @@ module.exports = function (page, popstate) {
     //preload pages if possible
     this.preloadPages();
 
-    Promise.all(promises).then(function () {
-        _this.triggerEvent('animationInDone');
-        // remove "to-{page}" classes
-        document.documentElement.className.split(' ').forEach(function (classItem) {
-            if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
-                document.documentElement.classList.remove(classItem);
-            }
+    if (!popstate || this.options.animateHistoryBrowsing) {
+        Promise.all(promises).then(function () {
+            _this.triggerEvent('animationInDone');
+            // remove "to-{page}" classes
+            document.documentElement.className.split(' ').forEach(function (classItem) {
+                if (new RegExp("^to-").test(classItem) || classItem === "is-changing" || classItem === "is-rendering" || classItem === "is-popstate") {
+                    document.documentElement.classList.remove(classItem);
+                }
+            });
         });
-    });
+    }
 
     // update current url
     this.getUrl();
@@ -847,7 +844,7 @@ module.exports = function (page, popstate) {
 };
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -859,17 +856,25 @@ var forEach = Array.prototype.forEach;
 module.exports = function (data, popstate) {
     var _this = this;
 
-    var finalPage = null;
-
     // scrolling
     if (this.options.doScrollingRightAway && !this.scrollToElement) {
         this.doScrolling(popstate);
     }
 
+    // create array for storing animation promises
     var animationPromises = [];
+
+    // set transition object
+    if (data.customTransition != null) {
+        this.updateTransition(window.location.pathname, data.url, data.customTransition);
+        document.documentElement.classList.add('to-' + this.classify(data.customTransition));
+    } else {
+        this.updateTransition(window.location.pathname, data.url);
+    }
 
     if (!popstate || this.options.animateHistoryBrowsing) {
         // start animation
+        this.triggerEvent('animationOutStart');
         document.documentElement.classList.add('is-changing');
         document.documentElement.classList.add('is-leaving');
         document.documentElement.classList.add('is-animating');
@@ -942,8 +947,8 @@ module.exports = function (data, popstate) {
     }
 
     Promise.all(animationPromises.concat([xhrPromise])).then(function () {
-        finalPage = _this.cache.getPage(data.url);
-        _this.renderPage(finalPage, popstate);
+        // render page
+        _this.renderPage(_this.cache.getPage(data.url), popstate);
         _this.preloadPromise = null;
     }).catch(function (errorUrl) {
         // rewrite the skipPopStateHandling function to redirect manually when the history.go is processed
@@ -958,7 +963,7 @@ module.exports = function (data, popstate) {
 };
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -995,7 +1000,7 @@ module.exports = function (html, request) {
 };
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1033,7 +1038,7 @@ module.exports = function (options) {
 };
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1059,7 +1064,7 @@ module.exports = function transitionEnd() {
 };
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1137,7 +1142,7 @@ var Cache = function () {
 exports.default = Cache;
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports) {
 
 var DOCUMENT_NODE_TYPE = 9;
@@ -1176,10 +1181,10 @@ module.exports = closest;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(23);
+var closest = __webpack_require__(22);
 
 /**
  * Delegates event to a selector.
@@ -1260,7 +1265,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1280,11 +1285,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 // modules
 
 
-var _delegate = __webpack_require__(24);
+var _delegate = __webpack_require__(23);
 
 var _delegate2 = _interopRequireDefault(_delegate);
 
-var _Cache = __webpack_require__(22);
+var _Cache = __webpack_require__(21);
 
 var _Cache2 = _interopRequireDefault(_Cache);
 
@@ -1292,29 +1297,25 @@ var _Link = __webpack_require__(0);
 
 var _Link2 = _interopRequireDefault(_Link);
 
-var _transitionEnd = __webpack_require__(21);
+var _transitionEnd = __webpack_require__(20);
 
 var _transitionEnd2 = _interopRequireDefault(_transitionEnd);
 
-var _request = __webpack_require__(20);
+var _request = __webpack_require__(19);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _getDataFromHtml = __webpack_require__(19);
+var _getDataFromHtml = __webpack_require__(18);
 
 var _getDataFromHtml2 = _interopRequireDefault(_getDataFromHtml);
 
-var _loadPage = __webpack_require__(18);
+var _loadPage = __webpack_require__(17);
 
 var _loadPage2 = _interopRequireDefault(_loadPage);
 
-var _renderPage = __webpack_require__(17);
+var _renderPage = __webpack_require__(16);
 
 var _renderPage2 = _interopRequireDefault(_renderPage);
-
-var _goBack = __webpack_require__(16);
-
-var _goBack2 = _interopRequireDefault(_goBack);
 
 var _createState = __webpack_require__(15);
 
@@ -1407,8 +1408,6 @@ var Swup = function () {
         /**
          * helper variables
          */
-        // mobile detection variable
-        this.mobile = false;
         // id of element to scroll to after render
         this.scrollToElement = null;
         // promise used for preload, so no new loading of the same page starts while page is loading
@@ -1430,7 +1429,6 @@ var Swup = function () {
         this.scrollTo = _scrollTo2.default;
         this.loadPage = _loadPage2.default;
         this.renderPage = _renderPage2.default;
-        this.goBack = _goBack2.default;
         this.createState = _createState2.default;
         this.triggerEvent = _triggerEvent2.default;
         this.classify = _classify2.default;
@@ -1442,13 +1440,6 @@ var Swup = function () {
         this.log = _log2.default;
         this.enable = this.enable;
         this.destroy = this.destroy;
-
-        /**
-         * detect mobile devices
-         */
-        if (window.innerWidth <= 767) {
-            this.mobile = true;
-        }
 
         // attach instance to window in debug mode
         if (this.options.debugMode) {
@@ -1593,11 +1584,15 @@ var Swup = function () {
                 var link = new _Link2.default();
                 event.preventDefault();
                 link.setPath(event.delegateTarget.href);
+
                 if (link.getAddress() == this.currentUrl || link.getAddress() == '') {
+                    // link to the same URL
                     if (link.getHash() != '') {
+                        // link to the same URL with hash
                         this.triggerEvent('samePageWithHash');
                         var element = document.querySelector(link.getHash());
                         if (element != null) {
+                            // referenced element found
                             if (this.options.scroll) {
                                 var top = element.getBoundingClientRect().top + window.pageYOffset;
                                 this.scrollTo(document.body, top);
@@ -1608,29 +1603,30 @@ var Swup = function () {
                                 source: "swup"
                             }, document.title, link.getAddress() + link.getHash());
                         } else {
+                            // referenced element not found
                             console.warn('Element for offset not found (' + link.getHash() + ')');
                         }
                     } else {
+                        // link to the same URL without hash
                         this.triggerEvent('samePage');
                         if (this.options.scroll) {
                             this.scrollTo(document.body, 0, 1);
                         }
                     }
                 } else {
+                    // link to different url
                     if (link.getHash() != '') {
                         this.scrollToElement = link.getHash();
                     }
-                    // custom class fro dynamic pages
-                    var swupClass = event.delegateTarget.dataset.swupClass;
-                    if (swupClass != null) {
-                        this.updateTransition(window.location.pathname, link.getAddress(), event.delegateTarget.dataset.swupClass);
-                        document.documentElement.classList.add('to-' + swupClass);
-                    } else {
-                        this.updateTransition(window.location.pathname, link.getAddress());
-                    }
-                    this.loadPage({ url: link.getAddress() }, false);
+
+                    // get custom transition from data
+                    var customTransition = event.delegateTarget.dataset.swupTransition;
+
+                    // load page
+                    this.loadPage({ url: link.getAddress(), customTransition: customTransition }, false);
                 }
             } else {
+                // open in new tab (do nothing)
                 this.triggerEvent('openPageInNewTab');
             }
         }
@@ -1755,7 +1751,7 @@ var Swup = function () {
 exports.default = Swup;
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1767,7 +1763,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _swup = __webpack_require__(25);
+var _swup = __webpack_require__(24);
 
 var _swup2 = _interopRequireDefault(_swup);
 
@@ -1842,13 +1838,13 @@ var Swupjs = function (_Swup) {
 exports.default = Swupjs;
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _index = __webpack_require__(26);
+var _index = __webpack_require__(25);
 
 var _index2 = _interopRequireDefault(_index);
 
