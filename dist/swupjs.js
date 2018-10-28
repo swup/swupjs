@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -197,7 +197,6 @@ module.exports = function (transition, animations, type) {
         animation = animations['*'];
         animationName = '*';
     }
-    this.triggerEvent('pageAnimation:' + animationName);
 
     return animation[type];
 };
@@ -533,6 +532,56 @@ module.exports = function (from, to, custom) {
 "use strict";
 
 
+module.exports = function off(event, handler) {
+    var _this = this;
+
+    if (event != null) {
+        if (handler != null) {
+            if (this._handlers[event] && this._handlers[event].filter(function (savedHandler) {
+                return savedHandler === handler;
+            }).length) {
+                var toRemove = this._handlers[event].filter(function (savedHandler) {
+                    return savedHandler === handler;
+                })[0];
+                var index = this._handlers[event].indexOf(toRemove);
+                if (index > -1) {
+                    this._handlers[event].splice(index, 1);
+                }
+            } else {
+                console.warn("Handler for event '" + event + "' no found.");
+            }
+        } else {
+            this._handlers[event] = [];
+        }
+    } else {
+        Object.keys(this._handlers).forEach(function (keys) {
+            _this._handlers[keys] = [];
+        });
+    }
+};
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function on(event, handler) {
+    if (this._handlers[event]) {
+        this._handlers[event].push(handler);
+    } else {
+        console.warn("Unsupported event " + event + ".");
+    }
+};
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 module.exports = function (element) {
     var _this = this;
 
@@ -551,7 +600,7 @@ module.exports = function (element) {
 };
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -575,7 +624,7 @@ module.exports = function (popstate) {
 };
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -594,7 +643,7 @@ module.exports = function (text) {
 };
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -684,7 +733,7 @@ module.exports = function (element, to) {
 };
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -695,22 +744,33 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = function (eventName) {
-    if (this.options.debugMode) {
+module.exports = function (eventName, originalEvent) {
+    if (this.options.debugMode && originalEvent) {
+        console.groupCollapsed('%cswup:' + '%c' + eventName, 'color: #343434', 'color: #009ACD');
+        console.log(originalEvent);
+        console.groupEnd();
+    } else if (this.options.debugMode) {
         console.log('%cswup:' + '%c' + eventName, 'color: #343434', 'color: #009ACD');
     }
+
+    // call saved handlers with "on" method and pass originalEvent object if available
+    this._handlers[eventName].forEach(function (handler) {
+        return handler(originalEvent);
+    });
+
+    // trigger event on document with prefix "swup:"
     var event = new CustomEvent('swup:' + eventName, { detail: eventName });
     document.dispatchEvent(event);
 };
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -725,7 +785,7 @@ module.exports = function (url) {
 };
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -844,7 +904,7 @@ module.exports = function (page, popstate) {
 };
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -963,7 +1023,7 @@ module.exports = function (data, popstate) {
 };
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1000,7 +1060,7 @@ module.exports = function (html, request) {
 };
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1038,7 +1098,7 @@ module.exports = function (options) {
 };
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1064,7 +1124,7 @@ module.exports = function transitionEnd() {
 };
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1142,7 +1202,7 @@ var Cache = function () {
 exports.default = Cache;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 var DOCUMENT_NODE_TYPE = 9;
@@ -1181,10 +1241,10 @@ module.exports = closest;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var closest = __webpack_require__(22);
+var closest = __webpack_require__(24);
 
 /**
  * Delegates event to a selector.
@@ -1265,7 +1325,7 @@ module.exports = delegate;
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1285,11 +1345,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 // modules
 
 
-var _delegate = __webpack_require__(23);
+var _delegate = __webpack_require__(25);
 
 var _delegate2 = _interopRequireDefault(_delegate);
 
-var _Cache = __webpack_require__(21);
+var _Cache = __webpack_require__(23);
 
 var _Cache2 = _interopRequireDefault(_Cache);
 
@@ -1297,53 +1357,61 @@ var _Link = __webpack_require__(0);
 
 var _Link2 = _interopRequireDefault(_Link);
 
-var _transitionEnd = __webpack_require__(20);
+var _transitionEnd = __webpack_require__(22);
 
 var _transitionEnd2 = _interopRequireDefault(_transitionEnd);
 
-var _request = __webpack_require__(19);
+var _request = __webpack_require__(21);
 
 var _request2 = _interopRequireDefault(_request);
 
-var _getDataFromHtml = __webpack_require__(18);
+var _getDataFromHtml = __webpack_require__(20);
 
 var _getDataFromHtml2 = _interopRequireDefault(_getDataFromHtml);
 
-var _loadPage = __webpack_require__(17);
+var _loadPage = __webpack_require__(19);
 
 var _loadPage2 = _interopRequireDefault(_loadPage);
 
-var _renderPage = __webpack_require__(16);
+var _renderPage = __webpack_require__(18);
 
 var _renderPage2 = _interopRequireDefault(_renderPage);
 
-var _createState = __webpack_require__(15);
+var _createState = __webpack_require__(17);
 
 var _createState2 = _interopRequireDefault(_createState);
 
-var _triggerEvent = __webpack_require__(14);
+var _triggerEvent = __webpack_require__(16);
 
 var _triggerEvent2 = _interopRequireDefault(_triggerEvent);
 
-var _getUrl = __webpack_require__(13);
+var _getUrl = __webpack_require__(15);
 
 var _getUrl2 = _interopRequireDefault(_getUrl);
 
-var _scrollTo = __webpack_require__(12);
+var _scrollTo = __webpack_require__(14);
 
 var _scrollTo2 = _interopRequireDefault(_scrollTo);
 
-var _classify = __webpack_require__(11);
+var _classify = __webpack_require__(13);
 
 var _classify2 = _interopRequireDefault(_classify);
 
-var _doScrolling = __webpack_require__(10);
+var _doScrolling = __webpack_require__(12);
 
 var _doScrolling2 = _interopRequireDefault(_doScrolling);
 
-var _markSwupElements = __webpack_require__(9);
+var _markSwupElements = __webpack_require__(11);
 
 var _markSwupElements2 = _interopRequireDefault(_markSwupElements);
+
+var _on = __webpack_require__(10);
+
+var _on2 = _interopRequireDefault(_on);
+
+var _off = __webpack_require__(9);
+
+var _off2 = _interopRequireDefault(_off);
 
 var _updateTransition = __webpack_require__(8);
 
@@ -1408,6 +1476,31 @@ var Swup = function () {
         /**
          * helper variables
          */
+        this._handlers = {
+            willReplaceContent: [],
+            contentReplaced: [],
+            pageView: [],
+            hoverLink: [],
+            clickLink: [],
+            samePageWithHash: [],
+            animationOutStart: [],
+            animationOutDone: [],
+            animationSkipped: [],
+            pagePreloaded: [],
+            pageLoaded: [],
+            scrollStart: [],
+            scrollDone: [],
+            animationInStart: [],
+            animationInDone: [],
+            pageRetrievedFromCache: [],
+            submitForm: [],
+            enabled: [],
+            disabled: []
+        };
+
+        /**
+         * helper variables
+         */
         // id of element to scroll to after render
         this.scrollToElement = null;
         // promise used for preload, so no new loading of the same page starts while page is loading
@@ -1434,6 +1527,8 @@ var Swup = function () {
         this.classify = _classify2.default;
         this.doScrolling = _doScrolling2.default;
         this.markSwupElements = _markSwupElements2.default;
+        this.on = _on2.default;
+        this.off = _off2.default;
         this.updateTransition = _updateTransition2.default;
         this.preloadPages = _preloadPages2.default;
         this.usePlugin = _usePlugin2.default;
@@ -1572,6 +1667,9 @@ var Swup = function () {
                 delete element.dataset.swup;
             });
 
+            // remove handlers
+            this.off();
+
             this.triggerEvent('disabled');
             document.documentElement.classList.remove('swup-enabled');
         }
@@ -1580,7 +1678,7 @@ var Swup = function () {
         value: function linkClickHandler(event) {
             // no control key pressed
             if (!event.metaKey) {
-                this.triggerEvent('clickLink');
+                this.triggerEvent('clickLink', event);
                 var link = new _Link2.default();
                 event.preventDefault();
                 link.setPath(event.delegateTarget.href);
@@ -1589,7 +1687,7 @@ var Swup = function () {
                     // link to the same URL
                     if (link.getHash() != '') {
                         // link to the same URL with hash
-                        this.triggerEvent('samePageWithHash');
+                        this.triggerEvent('samePageWithHash', event);
                         var element = document.querySelector(link.getHash());
                         if (element != null) {
                             // referenced element found
@@ -1608,7 +1706,7 @@ var Swup = function () {
                         }
                     } else {
                         // link to the same URL without hash
-                        this.triggerEvent('samePage');
+                        this.triggerEvent('samePage', event);
                         if (this.options.scroll) {
                             this.scrollTo(document.body, 0, 1);
                         }
@@ -1627,7 +1725,7 @@ var Swup = function () {
                 }
             } else {
                 // open in new tab (do nothing)
-                this.triggerEvent('openPageInNewTab');
+                this.triggerEvent('openPageInNewTab', event);
             }
         }
     }, {
@@ -1635,7 +1733,7 @@ var Swup = function () {
         value: function linkMouseoverHandler(event) {
             var _this2 = this;
 
-            this.triggerEvent('hoverLink');
+            this.triggerEvent('hoverLink', event);
             if (this.options.preload) {
                 var link = new _Link2.default();
                 link.setPath(event.delegateTarget.href);
@@ -1643,7 +1741,7 @@ var Swup = function () {
                     this.preloadPromise = new Promise(function (resolve, reject) {
                         _this2.getPage({ url: link.getAddress() }, function (response, request) {
                             if (request.status === 500) {
-                                _this2.triggerEvent('serverError');
+                                _this2.triggerEvent('serverError', event);
                                 reject(link.getAddress());
                                 return;
                             } else {
@@ -1652,7 +1750,7 @@ var Swup = function () {
                                 if (page != null) {
                                     page.url = link.getAddress();
                                     _this2.cache.cacheUrl(page, _this2.options.debugMode);
-                                    _this2.triggerEvent('pagePreloaded');
+                                    _this2.triggerEvent('pagePreloaded', event);
                                 } else {
                                     reject(link.getAddress());
                                     return;
@@ -1671,7 +1769,7 @@ var Swup = function () {
         value: function formSubmitHandler(event) {
             // no control key pressed
             if (!event.metaKey) {
-                this.triggerEvent('submitForm');
+                this.triggerEvent('submitForm', event);
                 event.preventDefault();
                 var form = event.target;
                 var formData = new FormData(form);
@@ -1726,7 +1824,7 @@ var Swup = function () {
                     });
                 }
             } else {
-                this.triggerEvent('openFormSubmitInNewTab');
+                this.triggerEvent('openFormSubmitInNewTab', event);
             }
         }
     }, {
@@ -1740,7 +1838,7 @@ var Swup = function () {
             } else {
                 event.preventDefault();
             }
-            this.triggerEvent('popState');
+            this.triggerEvent('popState', event);
             this.loadPage({ url: link.getAddress() }, event);
         }
     }]);
@@ -1751,7 +1849,7 @@ var Swup = function () {
 exports.default = Swup;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1763,7 +1861,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _swup = __webpack_require__(24);
+var _swup = __webpack_require__(26);
 
 var _swup2 = _interopRequireDefault(_swup);
 
@@ -1838,13 +1936,13 @@ var Swupjs = function (_Swup) {
 exports.default = Swupjs;
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _index = __webpack_require__(25);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 

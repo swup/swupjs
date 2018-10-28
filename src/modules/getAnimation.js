@@ -39,7 +39,6 @@ module.exports = function (transition, animations, type) {
         animation = animations['*']
         animationName = '*'
     }
-    this.triggerEvent(`pageAnimation:${animationName}`)
 
     return animation[type]
 }
