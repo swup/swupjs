@@ -1487,7 +1487,7 @@ var Swup = function () {
         var options = _extends({}, defaults, setOptions);
 
         /**
-         * helper variables
+         * handler arrays
          */
         this._handlers = {
             willReplaceContent: [],
@@ -1507,6 +1507,7 @@ var Swup = function () {
             animationInStart: [],
             animationInDone: [],
             pageRetrievedFromCache: [],
+            popState: [],
             submitForm: [],
             enabled: [],
             disabled: []
