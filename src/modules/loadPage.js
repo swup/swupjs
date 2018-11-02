@@ -56,7 +56,7 @@ module.exports = function (data, popstate) {
         this.triggerEvent('pageRetrievedFromCache')
     } else {
         if (!this.preloadPromise || this.preloadPromise.route != data.url) {
-            var xhrPromise = new Promise(resolve => {
+            var xhrPromise = new Promise((resolve, reject) => {
                 this.getPage(data, (response, request) => {
                     if (request.status === 500) {
                         this.triggerEvent('serverError')

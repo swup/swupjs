@@ -372,7 +372,7 @@ module.exports = function (data, popstate) {
         this.triggerEvent('pageRetrievedFromCache');
     } else {
         if (!this.preloadPromise || this.preloadPromise.route != data.url) {
-            var xhrPromise = new Promise(function (resolve) {
+            var xhrPromise = new Promise(function (resolve, reject) {
                 _this.getPage(data, function (response, request) {
                     if (request.status === 500) {
                         _this.triggerEvent('serverError');
@@ -1490,28 +1490,29 @@ var Swup = function () {
          * handler arrays
          */
         this._handlers = {
-            willReplaceContent: [],
-            contentReplaced: [],
-            pageView: [],
-            hoverLink: [],
+            animationInDone: [],
+            animationInStart: [],
+            animationOutDone: [],
+            animationOutStart: [],
+            animationSkipped: [],
             clickLink: [],
+            contentReplaced: [],
+            disabled: [],
+            enabled: [],
+            hoverLink: [],
+            openPageInNewTab: [],
+            pageLoaded: [],
+            pagePreloaded: [],
+            pageRetrievedFromCache: [],
+            pageView: [],
+            popState: [],
             samePage: [],
             samePageWithHash: [],
-            animationOutStart: [],
-            animationOutDone: [],
-            animationSkipped: [],
-            pagePreloaded: [],
-            pageLoaded: [],
-            scrollStart: [],
             scrollDone: [],
-            animationInStart: [],
-            animationInDone: [],
-            pageRetrievedFromCache: [],
-            popState: [],
-            openPageInNewTab: [],
+            scrollStart: [],
+            serverError: [],
             submitForm: [],
-            enabled: [],
-            disabled: []
+            willReplaceContent: []
         };
 
         /**
@@ -1695,6 +1696,7 @@ var Swup = function () {
         value: function linkClickHandler(event) {
             // no control key pressed
             if (!event.metaKey) {
+                // index of pressed button needs to be checked because Firefox triggers click on all mouse buttons
                 if (event.button === 0) {
                     this.triggerEvent('clickLink', event);
                     var link = new _Link2.default();
@@ -1813,7 +1815,7 @@ var Swup = function () {
                 } else {
                     // create base url
                     var url = link.getAddress() || window.location.href;
-                    var inputs = form.querySelectorAll('input');
+                    var inputs = form.querySelectorAll('input, select');
                     if (url.indexOf('?') == -1) {
                         url += "?";
                     } else {
