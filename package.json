@@ -1,6 +1,6 @@
 {
   "name": "swupjs",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "Complete, flexible, easy to use page transition library - swup extension.",
   "main": "lib/index.js",
   "scripts": {
@@ -31,6 +31,6 @@
     "webpack-cli": "^2.1.3"
   },
   "dependencies": {
-    "swup": "^1.7.7"
+    "swup": "^1.7.16"
   }
 }
