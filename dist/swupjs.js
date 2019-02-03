@@ -522,22 +522,27 @@ module.exports = function (pathname) {
 
     var link = new _Link2.default();
     link.setPath(pathname);
-    if (link.getAddress() != this.currentUrl && !this.cache.exists(link.getAddress()) && this.preloadPromise == null) {
-        this.getPage({ url: link.getAddress() }, function (response, request) {
-            if (request.status === 500) {
-                _this.triggerEvent('serverError');
-                return;
-            } else {
-                // get json data
-                var page = _this.getDataFromHtml(response, request);
-                if (page != null) {
-                    page.url = link.getAddress();
-                    _this.cache.cacheUrl(page, _this.options.debugMode);
-                    _this.triggerEvent('pagePreloaded');
+    return new Promise(function (resolve, reject) {
+        if (link.getAddress() != _this.currentUrl && !_this.cache.exists(link.getAddress())) {
+            _this.getPage({ url: link.getAddress() }, function (response, request) {
+                if (request.status === 500) {
+                    _this.triggerEvent('serverError');
+                    reject();
+                } else {
+                    // get json data
+                    var page = _this.getDataFromHtml(response, request);
+                    if (page != null) {
+                        page.url = link.getAddress();
+                        _this.cache.cacheUrl(page, _this.options.debugMode);
+                        _this.triggerEvent('pagePreloaded');
+                    }
+                    resolve(_this.cache.getPage(link.getAddress()));
                 }
-            }
-        });
-    }
+            });
+        } else {
+            resolve(_this.cache.getPage(link.getAddress()));
+        }
+    });
 };
 
 /***/ }),
@@ -1454,6 +1459,8 @@ var _log = __webpack_require__(6);
 
 var _log2 = _interopRequireDefault(_log);
 
+var _utils = __webpack_require__(0);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1693,7 +1700,7 @@ var Swup = function () {
             this.cache.empty();
 
             // remove swup data atributes from blocks
-            document.querySelectorAll('[data-swup]').forEach(function (element) {
+            (0, _utils.queryAll)('[data-swup]').forEach(function (element) {
                 delete element.dataset.swup;
             });
 
@@ -1707,7 +1714,7 @@ var Swup = function () {
         key: 'linkClickHandler',
         value: function linkClickHandler(event) {
             // no control key pressed
-            if (!event.metaKey) {
+            if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
                 // index of pressed button needs to be checked because Firefox triggers click on all mouse buttons
                 if (event.button === 0) {
                     this.triggerEvent('clickLink', event);
@@ -1827,7 +1834,7 @@ var Swup = function () {
                 } else {
                     // create base url
                     var url = link.getAddress() || window.location.href;
-                    var inputs = form.querySelectorAll('input, select');
+                    var inputs = (0, _utils.queryAll)('input, select', form);
                     if (url.indexOf('?') == -1) {
                         url += "?";
                     } else {
