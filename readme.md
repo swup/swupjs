@@ -1,4 +1,8 @@
 # swupjs
+
+| WARNING: this repository is deprecated in favour of [JS-plugin](https://swup.js.org/plugins/js-plugin) |
+| --- |
+
 Swupjs is an extension of [swup](https://github.com/gmrchk/swup), which modifies the module for use with JavaScript animations.
 
 Swupjs only slightly modifies swup, where all the capabilities of swup remain the same, with only one exception - timing and animations are based on JavaScript, not CSS transitions. 

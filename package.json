@@ -1,6 +1,6 @@
 {
   "name": "swupjs",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Complete, flexible, easy to use page transition library - swup extension.",
   "main": "lib/index.js",
   "scripts": {
